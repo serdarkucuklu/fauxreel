@@ -185,11 +185,13 @@ def _ass_time(sec):
     s = cs // 100; cs -= s * 100
     return f"{h:d}:{m:02d}:{s:02d}.{cs:02d}"
 
-def srt_to_karaoke_ass(srt_path, ass_path, accent="&H0033CCFF", fontsize=120, margin_v=0, offset=0.0):
-    """Write an ASS where each word pops in big, centered — the modern faceless look.
-       accent = ASS BGR hex for the highlight tint (default gold). margin_v shifts from center.
-       offset = seconds to add to every cue (e.g. to start captions after a hook)."""
-    events = [(a + offset, b + offset, w) for (a, b, w) in _srt_to_events(srt_path)]
+def srt_to_karaoke_ass(srt_path, ass_path, accent="&H00FFFF&", fontsize=96, margin_v=0,
+                       offset=0.0, chunk=3, max_chars=16):
+    """Chunked karaoke captions (1-3 words on screen) with the ACTIVE word highlighted
+       (Hormozi/Submagic style — the category-defining caption look). accent = inline ASS
+       colour &Hbbggrr for the spoken word (default yellow); the rest stay white. Centered,
+       ALL CAPS, heavy outline, pop-in on each new chunk. offset shifts all cues (post-hook)."""
+    words = [(a + offset, b + offset, w.upper()) for (a, b, w) in _srt_to_events(srt_path)]
     header = (
         "[Script Info]\nScriptType: v4.00+\nPlayResX: 1080\nPlayResY: 1920\nWrapStyle: 2\n\n"
         "[V4+ Styles]\n"
@@ -197,18 +199,24 @@ def srt_to_karaoke_ass(srt_path, ass_path, accent="&H0033CCFF", fontsize=120, ma
         "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
         "Alignment, MarginL, MarginR, MarginV, Encoding\n"
         f"Style: Pop,Montserrat,{fontsize},&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,"
-        f"-1,0,0,0,100,100,0,0,1,7,3,5,60,60,{margin_v},1\n\n"
+        f"-1,0,0,0,100,100,0,0,1,8,2,5,40,40,{margin_v},1\n\n"
         "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
     )
+    # greedy chunks: up to `chunk` words / `max_chars` chars per on-screen phrase
+    chunks, i = [], 0
+    while i < len(words):
+        grp = [words[i]]; L = len(words[i][2]); i += 1
+        while i < len(words) and len(grp) < chunk and L + 1 + len(words[i][2]) <= max_chars:
+            L += 1 + len(words[i][2]); grp.append(words[i]); i += 1
+        chunks.append(grp)
     lines = []
-    for (a, b, word) in events:
-        dur = max(0.05, b - a)
-        popn = int(min(120, dur * 1000 * 0.35))
-        # pop-in scale 55->112->100 + slight upward drift; whole word tinted on the "hit"
-        eff = (r"{\an5\fad(40,40)\fscx55\fscy55"
-               r"\t(0," + str(popn) + r",\fscx112\fscy112)"
-               r"\t(" + str(popn) + r"," + str(popn + 60) + r",\fscx100\fscy100)}")
-        lines.append(f"Dialogue: 0,{_ass_time(a)},{_ass_time(b)},Pop,,0,0,0,,{eff}{word.upper()}")
+    pop = r"\fad(45,25)\fscx58\fscy58\t(0,110,\fscx108\fscy108)\t(110,175,\fscx100\fscy100)"
+    for grp in chunks:
+        cw = [g[2] for g in grp]
+        for j, (a, b, _w) in enumerate(grp):
+            parts = ["{\\c" + (accent if k == j else "&HFFFFFF&") + "}" + w for k, w in enumerate(cw)]
+            override = "{\\an5" + (pop if j == 0 else "") + "}"
+            lines.append("Dialogue: 0," + _ass_time(a) + "," + _ass_time(b) + ",Pop,,0,0,0,," + override + " ".join(parts))
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(header + "\n".join(lines) + "\n")
 

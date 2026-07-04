@@ -116,19 +116,21 @@ def finalize_job(raw):
 
 # ── Reddit-story jobs ─────────────────────────────────────────────────────────
 REDDIT_FALLBACK = (
-    "So this happened last week and I honestly can't tell if I overreacted. I set one simple boundary, "
-    "and my family acted like I had committed a crime. The group chat has not stopped blowing up since. "
-    "Half of them are on my side, the other half say I am heartless and selfish. My partner thinks I was right, "
-    "but the guilt is eating at me. I keep replaying the whole thing in my head. I just wanted things to be fair "
-    "for once, and now everyone is acting like I ruined the entire family."
+    "My sister told the whole family I ruined her wedding — but she conveniently left out that she tried to "
+    "replace me as maid of honor two days before, over text. So when she demanded I still pay for half the flowers, "
+    "I said no and walked out. Now my phone won't stop buzzing. Half of them call me petty, my mom says I embarrassed "
+    "her, and my aunt actually blocked me. Nobody wants to talk about what she did — only about how I reacted. "
+    "I'm starting to wonder if I went too far, or if they just picked the easy target."
 )
 
 def _gemini_reddit_story(title):
     key = os.environ.get("GEMINI_API_KEY")
     if not key:
         return None
-    instr = (f'Write a first-person Reddit r/AmItheAsshole style story, 110-160 words, punchy and dramatic '
-             f'but realistic, ending on a moral dilemma, for this title: "{title}". '
+    instr = (f'Write a first-person Reddit r/AmItheAsshole style story, 90-140 words, for this title: "{title}". '
+             f'CRITICAL: the FIRST sentence must be the spiciest, most shocking line — a real hook. Do NOT open '
+             f'with setup like "So this happened" or "I need advice". Fast pacing, high emotional stakes '
+             f'(outrage / vindication / betrayal), realistic details, ending on a genuine moral dilemma. '
              f'Plain text only — no title, no markdown, no quotes.')
     body = {"contents": [{"parts": [{"text": instr}]}]}
     for model in GEMINI_MODELS:
