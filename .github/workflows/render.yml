@@ -29,6 +29,7 @@ jobs:
       - name: Render (job comes from client_payload via GITHUB_EVENT_PATH)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # optional (topic -> script)
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}   # optional (real background footage)
         run: python worker.py
 
       - name: Publish to the "renders" release
