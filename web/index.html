@@ -30,6 +30,26 @@
         <p class="sub">Paste a script, or a topic and we script it.</p>
 
         <div class="field">
+          <div class="fx-mode" id="mode-seg">
+            <button type="button" class="mode-btn" data-mode="reel" aria-pressed="true">🎬 AI Reel</button>
+            <button type="button" class="mode-btn" data-mode="reddit" aria-pressed="false">👽 Reddit Story</button>
+          </div>
+        </div>
+
+        <div class="field reddit-only" style="display:none">
+          <label for="rs-title">Reddit post title</label>
+          <textarea id="rs-title" style="min-height:60px">AITA for telling my sister she can't bring her dog to my wedding?</textarea>
+        </div>
+        <div class="field reddit-only" style="display:none">
+          <label for="rs-story">Story <span style="color:var(--muted);font-weight:400">— leave empty and AI writes it</span></label>
+          <textarea id="rs-story" style="min-height:120px">My sister treats her golden retriever like her child. When I said no dogs at the venue, she called me heartless. Now half my family is texting me that I ruined her month. I just wanted one clean ceremony.</textarea>
+        </div>
+        <div class="field reddit-only" style="display:none">
+          <label for="rs-sub">Subreddit</label>
+          <input type="text" id="rs-sub" value="AmItheAsshole">
+        </div>
+
+        <div class="field reel-only">
           <label for="script">Script or topic</label>
           <textarea id="script">Most people never start. They wait for the perfect moment. But the perfect moment is a myth. You build momentum by beginning, today.</textarea>
         </div>
@@ -52,7 +72,7 @@
             </div>
           </div>
         </div>
-        <div class="field">
+        <div class="field reel-only">
           <label for="scenes">Scene prompts (one per line, optional)</label>
           <textarea id="scenes" style="min-height:70px">lone figure hiking a misty mountain at sunrise
 hands typing on a laptop in a dark room, glowing screen

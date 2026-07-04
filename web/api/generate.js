@@ -17,11 +17,16 @@ module.exports = async (req, res) => {
   const id = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
   const payload = {
     id,
+    format: body.format === "reddit" ? "reddit" : undefined,
     text: String(body.text || "").slice(0, 1200),
     mode: body.mode === "script" || body.mode === "topic" ? body.mode : undefined,
     voice: body.voice, rate: body.rate, mood: body.mood,
     brand: body.pro ? "" : "fauxreel.vercel.app",   // Pro removes the watermark
     scenes: Array.isArray(body.scenes) ? body.scenes.slice(0, 5) : [],
+    // Reddit-story fields
+    title: body.title ? String(body.title).slice(0, 300) : undefined,
+    story: body.story ? String(body.story).slice(0, 3000) : undefined,
+    subreddit: body.subreddit ? String(body.subreddit).slice(0, 50) : undefined,
   };
 
   try {

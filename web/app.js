@@ -4,19 +4,18 @@
 (function () {
   "use strict";
   const $ = (id) => document.getElementById(id);
-  const DEMO_SRC = "sample.mp4";
+  let MODE = "reel";
+  const DEMO = { reel: "sample.mp4", reddit: "reddit_sample.mp4" };
 
   function job() {
+    const common = { voice: $("voice").value, mood: $("mood").value, pro: !!localStorage.getItem("fauxreel_pro") };
+    if (MODE === "reddit") {
+      return Object.assign({ format: "reddit", title: $("rs-title").value.trim(),
+        story: $("rs-story").value.trim(), subreddit: $("rs-sub").value.trim() }, common);
+    }
     const text = $("script").value.trim();
     const scenes = $("scenes").value.split("\n").map((s) => s.trim()).filter(Boolean).map((p) => ({ prompt: p }));
-    return {
-      text,
-      mode: text.split(/\s+/).length > 8 ? "script" : "topic",
-      voice: $("voice").value,
-      mood: $("mood").value,
-      scenes,
-      pro: !!localStorage.getItem("fauxreel_pro"),
-    };
+    return Object.assign({ text, mode: text.split(/\s+/).length > 8 ? "script" : "topic", scenes }, common);
   }
 
   function busy(label) {
@@ -74,12 +73,21 @@
       if (!url) throw new Error("timed out");
       showVideo(url);
     } catch (e) {
-      $("demo-banner").textContent = "Preview mode: showing a real sample rendered by the engine. Deploy the render worker (ARCHITECTURE.md) to generate from your own script.";
-      setTimeout(() => showVideo(DEMO_SRC), 1400);
+      $("demo-banner").textContent = "Preview: showing a real sample rendered by the engine. Live generation runs on the render worker.";
+      setTimeout(() => showVideo(DEMO[MODE] || DEMO.reel), 1400);
     } finally {
       btn.disabled = false;
     }
   }
+
+  $("mode-seg").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-mode]"); if (!b) return;
+    MODE = b.dataset.mode;
+    document.querySelectorAll("#mode-seg .mode-btn").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.querySelectorAll(".reel-only").forEach((el) => { el.style.display = MODE === "reel" ? "" : "none"; });
+    document.querySelectorAll(".reddit-only").forEach((el) => { el.style.display = MODE === "reddit" ? "" : "none"; });
+    $("gen").textContent = MODE === "reddit" ? "👽 Generate Reddit video" : "✨ Generate video";
+  });
 
   $("gen").addEventListener("click", generate);
   $("regen").addEventListener("click", generate);

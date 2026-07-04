@@ -67,3 +67,8 @@ a{color:inherit}
 .pro-msg.ok{color:var(--up)}
 .pro-msg.err{color:var(--down)}
 body.pro .prolink{color:var(--up)}
+
+/* mode toggle (Reel / Reddit Story) */
+.fx-mode{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px}
+.fx-mode .mode-btn{flex:1;border:none;background:transparent;color:var(--muted);cursor:pointer;padding:10px 12px;border-radius:999px;font:700 .9rem Inter;transition:background .2s,color .2s}
+.fx-mode .mode-btn[aria-pressed="true"]{background:var(--accent);color:#fff}

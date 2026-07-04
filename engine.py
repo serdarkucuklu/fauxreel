@@ -185,10 +185,11 @@ def _ass_time(sec):
     s = cs // 100; cs -= s * 100
     return f"{h:d}:{m:02d}:{s:02d}.{cs:02d}"
 
-def srt_to_karaoke_ass(srt_path, ass_path, accent="&H0033CCFF", fontsize=120, margin_v=0):
+def srt_to_karaoke_ass(srt_path, ass_path, accent="&H0033CCFF", fontsize=120, margin_v=0, offset=0.0):
     """Write an ASS where each word pops in big, centered — the modern faceless look.
-       accent = ASS BGR hex for the highlight tint (default gold). margin_v shifts from center."""
-    events = _srt_to_events(srt_path)
+       accent = ASS BGR hex for the highlight tint (default gold). margin_v shifts from center.
+       offset = seconds to add to every cue (e.g. to start captions after a hook)."""
+    events = [(a + offset, b + offset, w) for (a, b, w) in _srt_to_events(srt_path)]
     header = (
         "[Script Info]\nScriptType: v4.00+\nPlayResX: 1080\nPlayResY: 1920\nWrapStyle: 2\n\n"
         "[V4+ Styles]\n"

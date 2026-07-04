@@ -4,7 +4,7 @@ Reads a job from the repository_dispatch client_payload (CI) or --job file (loca
 fills gaps with scriptgen, renders with engine, writes output/render-<id>.mp4.
 """
 import os, sys, json
-import scriptgen, engine
+import scriptgen, engine, story
 
 
 def load_raw():
@@ -21,12 +21,17 @@ def load_raw():
 def main():
     raw = load_raw()
     job_id = str(raw.get("id") or "local")
-    job = scriptgen.finalize_job(raw)
-    print(f"[worker] id={job_id} voice={job['voice']} mood={job['mood']} scenes={len(job['scenes'])}")
-    print(f"[worker] script: {job['script'][:80]}…")
     os.makedirs(os.path.join(engine.HERE, "output"), exist_ok=True)
     out = os.path.join(engine.HERE, "output", f"render-{job_id}.mp4")
-    path = engine.render_video(job, out)
+
+    if (raw.get("format") or "").lower() == "reddit":
+        job = scriptgen.finalize_reddit_job(raw)
+        print(f"[worker] id={job_id} REDDIT r/{job['subreddit']} title={job['title'][:60]}…")
+        path = story.render_reddit_story(job, out)
+    else:
+        job = scriptgen.finalize_job(raw)
+        print(f"[worker] id={job_id} REEL voice={job['voice']} mood={job['mood']} scenes={len(job['scenes'])}")
+        path = engine.render_video(job, out)
     print("OUT=" + path)
     gh_out = os.environ.get("GITHUB_OUTPUT")
     if gh_out:

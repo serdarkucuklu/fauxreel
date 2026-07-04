@@ -114,6 +114,55 @@ def finalize_job(raw):
     }
 
 
+# ── Reddit-story jobs ─────────────────────────────────────────────────────────
+REDDIT_FALLBACK = (
+    "So this happened last week and I honestly can't tell if I overreacted. I set one simple boundary, "
+    "and my family acted like I had committed a crime. The group chat has not stopped blowing up since. "
+    "Half of them are on my side, the other half say I am heartless and selfish. My partner thinks I was right, "
+    "but the guilt is eating at me. I keep replaying the whole thing in my head. I just wanted things to be fair "
+    "for once, and now everyone is acting like I ruined the entire family."
+)
+
+def _gemini_reddit_story(title):
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        return None
+    instr = (f'Write a first-person Reddit r/AmItheAsshole style story, 110-160 words, punchy and dramatic '
+             f'but realistic, ending on a moral dilemma, for this title: "{title}". '
+             f'Plain text only — no title, no markdown, no quotes.')
+    body = {"contents": [{"parts": [{"text": instr}]}]}
+    for model in GEMINI_MODELS:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+            r = requests.post(url, json=body, timeout=45)
+            if r.status_code != 200:
+                continue
+            txt = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            if len(txt) > 80:
+                return txt
+        except Exception:
+            continue
+    return None
+
+def _plausible_stats(title):
+    seed = int(hashlib.md5(title.encode()).hexdigest()[:5], 16)
+    return f"{5 + seed % 46}.{seed % 9 + 1}k", f"{1 + (seed // 7) % 9}.{(seed // 3) % 9 + 1}k"
+
+def finalize_reddit_job(raw):
+    title = (raw.get("title") or raw.get("text") or "").strip() or "AITA for finally standing up for myself?"
+    body = (raw.get("story") or "").strip() or _gemini_reddit_story(title) or REDDIT_FALLBACK
+    up, com = _plausible_stats(title)
+    sub = (raw.get("subreddit") or "AmItheAsshole").replace("r/", "").strip() or "AmItheAsshole"
+    return {
+        "title": title, "story": body, "subreddit": sub,
+        "username": raw.get("username") or ("u_" + hashlib.md5(title.encode()).hexdigest()[:6]),
+        "upvotes": raw.get("upvotes") or up, "comments": raw.get("comments") or com,
+        "voice": raw.get("voice") or "en-US-JennyNeural", "rate": raw.get("rate") or "+0%",
+        "mood": raw.get("mood") or "drive", "brand": raw.get("brand", "fauxreel.vercel.app"),
+        "bg_query": raw.get("bg_query") or "satisfying", "pexels_key": raw.get("pexels_key"),
+    }
+
+
 if __name__ == "__main__":
     import sys
     demo = {"text": sys.argv[1] if len(sys.argv) > 1 else "discipline beats motivation", "mode": "topic"}
