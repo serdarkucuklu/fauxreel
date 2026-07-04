@@ -150,6 +150,10 @@ def _plausible_stats(title):
     seed = int(hashlib.md5(title.encode()).hexdigest()[:5], 16)
     return f"{5 + seed % 46}.{seed % 9 + 1}k", f"{1 + (seed // 7) % 9}.{(seed // 3) % 9 + 1}k"
 
+# "eyes-glued" hypnotic-motion backgrounds (legal Pexels stock, not game IP), rotated per story.
+BG_QUERIES = ["parkour", "aerial drone forest", "driving pov night", "kinetic sand cutting",
+              "neon tunnel", "ocean waves aerial", "soap cutting", "abstract flowing paint"]
+
 def finalize_reddit_job(raw):
     title = (raw.get("title") or raw.get("text") or "").strip() or "AITA for finally standing up for myself?"
     body = (raw.get("story") or "").strip() or _gemini_reddit_story(title) or REDDIT_FALLBACK
@@ -161,7 +165,8 @@ def finalize_reddit_job(raw):
         "upvotes": raw.get("upvotes") or up, "comments": raw.get("comments") or com,
         "voice": raw.get("voice") or "en-US-JennyNeural", "rate": raw.get("rate") or "+0%",
         "mood": raw.get("mood") or "drive", "brand": raw.get("brand", "fauxreel.vercel.app"),
-        "bg_query": raw.get("bg_query") or "satisfying", "pexels_key": raw.get("pexels_key"),
+        "bg_query": raw.get("bg_query") or BG_QUERIES[int(hashlib.md5(title.encode()).hexdigest()[:4], 16) % len(BG_QUERIES)],
+        "pexels_key": raw.get("pexels_key"),
     }
 
 
