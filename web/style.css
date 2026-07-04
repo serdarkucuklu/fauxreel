@@ -47,3 +47,23 @@ a{color:inherit}
 .disclaimer b{color:var(--text)}
 .footer{margin-top:28px;text-align:center;color:var(--muted);font-size:.82rem}
 .footer a{color:var(--accent);text-decoration:none}
+
+/* ─── Pro (freemium) modal ────────────────────────────────────────────────── */
+.pro-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.66);z-index:1000;backdrop-filter:blur(3px)}
+.pro-overlay.open{display:flex}
+.pro-modal{position:relative;width:min(430px,100%);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.5);padding:22px;text-align:center}
+.pro-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:1.6rem;line-height:1;cursor:pointer}
+.pro-modal h3{margin:2px 0 6px;font-size:1.2rem}
+.pro-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px}
+.pro-sub b{color:var(--accent)}
+.pro-buy{display:inline-flex;width:100%;justify-content:center;text-decoration:none;font-size:.98rem;padding:12px 18px}
+.pro-divider{display:flex;align-items:center;margin:16px 0;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em}
+.pro-divider::before,.pro-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.pro-divider span{padding:0 10px}
+.pro-activate{display:flex;gap:8px}
+.pro-activate input{flex:1;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font:inherit;font-size:.9rem;outline:none}
+.pro-activate input:focus{border-color:var(--accent)}
+.pro-msg{min-height:1.1em;font-size:.82rem;margin:10px 0 0;color:var(--muted)}
+.pro-msg.ok{color:var(--up)}
+.pro-msg.err{color:var(--down)}
+body.pro .prolink{color:var(--up)}

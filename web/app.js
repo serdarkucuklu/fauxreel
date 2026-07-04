@@ -83,9 +83,5 @@
 
   $("gen").addEventListener("click", generate);
   $("regen").addEventListener("click", generate);
-  $("prolink").addEventListener("click", () => {
-    // Freemium: same LemonSqueezy license pattern as FauxPost (wire the checkout URL when live).
-    // Pro removes the watermark (server honors { pro:true }) and unlocks more/HD renders.
-    window.open("https://fauxreel.lemonsqueezy.com/buy/PLACEHOLDER-PRODUCT-ID", "_blank");
-  });
+  // The Pro trigger (watermark removal / HD) is handled by pro.js via [data-pro-trigger].
 })();
