@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FauxReel — Faceless Short-Form Video Generator</title>
+  <meta name="description" content="Turn a topic or script into a ready-to-post vertical video — AI voiceover, visuals, captions and music. For TikTok, Reels and Shorts.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta property="og:title" content="FauxReel — Faceless video generator">
+  <meta property="og:description" content="Topic or script in, a finished vertical short out. Voiceover + visuals + captions + music.">
+  <meta name="theme-color" content="#0b0d12">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="wrap">
+    <a class="brand" href="./"><span class="logo">R</span> Faux<b>Reel</b></a>
+
+    <header class="hero">
+      <p class="eyebrow">Faceless · One click · TikTok / Reels / Shorts</p>
+      <h1>A <span class="grad">finished short</span> from one idea.</h1>
+      <p>Type a topic or paste a script. FauxReel writes the voiceover, finds the visuals, burns the captions and scores it — a vertical video, ready to post.</p>
+      <p class="demo-banner" id="demo-banner">Preview build — the generate button plays a real sample rendered by the engine. Live generation runs on the render worker (see ARCHITECTURE.md).</p>
+    </header>
+
+    <div class="editor">
+      <section class="panel" aria-label="Video options">
+        <h2>Create</h2>
+        <p class="sub">Paste a script, or a topic and we script it.</p>
+
+        <div class="field">
+          <label for="script">Script or topic</label>
+          <textarea id="script">Most people never start. They wait for the perfect moment. But the perfect moment is a myth. You build momentum by beginning, today.</textarea>
+        </div>
+        <div class="field">
+          <div class="row">
+            <div><label for="voice">Voice</label>
+              <select id="voice">
+                <option value="en-US-JennyNeural">Jenny (US, f)</option>
+                <option value="en-US-GuyNeural">Guy (US, m)</option>
+                <option value="en-GB-SoniaNeural">Sonia (UK, f)</option>
+                <option value="en-US-AriaNeural">Aria (US, f)</option>
+              </select>
+            </div>
+            <div><label for="mood">Vibe</label>
+              <select id="mood">
+                <option value="drive">Motivational</option>
+                <option value="calm">Calm</option>
+                <option value="bright">Upbeat</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="scenes">Scene prompts (one per line, optional)</label>
+          <textarea id="scenes" style="min-height:70px">lone figure hiking a misty mountain at sunrise
+hands typing on a laptop in a dark room, glowing screen
+city skyline at golden hour, aspirational</textarea>
+        </div>
+        <button class="gen" id="gen" type="button">✨ Generate video</button>
+        <button class="prolink" id="prolink" type="button">🔓 Pro — no watermark, HD, more renders</button>
+      </section>
+
+      <section aria-label="Preview">
+        <div class="stage" id="stage">
+          <div class="placeholder" id="placeholder">Your video preview appears here.</div>
+          <video id="video" style="display:none" controls playsinline></video>
+        </div>
+        <div class="result-actions" id="actions" style="display:none">
+          <a class="btn primary" id="download" download="fauxreel.mp4">⬇ Download</a>
+          <button class="btn" id="regen" type="button">↻ New render</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="disclaimer"><b>You own what you make.</b> Use generated videos responsibly; you're responsible for the claims and content of your scripts.</div>
+    <footer class="footer"><p>FauxReel · part of the FauxPost family · <a href="../ARCHITECTURE.md">how it works</a></p></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

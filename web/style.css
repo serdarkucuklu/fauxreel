@@ -1,0 +1,49 @@
+/* FauxReel — static frontend (dark premium, matches FauxPost family). */
+:root{
+  --bg:#0b0d12; --surface:#14171f; --surface-2:#1c202b; --text:#e9ecf2;
+  --muted:#9aa3b2; --border:rgba(255,255,255,.10); --accent:#7c5cff; --accent2:#ff5c8a;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.5;
+  background-image:radial-gradient(720px 420px at 12% -8%,rgba(124,92,255,.16),transparent 60%),radial-gradient(640px 420px at 100% 0%,rgba(255,92,138,.12),transparent 55%);min-height:100vh}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 72px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;text-decoration:none;font-size:1.15rem}
+.brand .logo{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:900}
+.brand b{color:var(--accent)}
+.hero{text-align:center;padding:26px 0 26px}
+.hero .eyebrow{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 12px}
+.hero h1{margin:0 0 12px;font-size:clamp(2rem,1.4rem+3vw,3.4rem);line-height:1.05;letter-spacing:-.03em;font-weight:800}
+.hero h1 .grad{background:linear-gradient(100deg,var(--accent),#ff7eb3 70%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{margin:0 auto;max-width:600px;color:var(--muted);font-size:1.05rem}
+.demo-banner{margin:8px auto 0;max-width:640px;font-size:.82rem;color:var(--muted);background:rgba(124,92,255,.08);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+
+.editor{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:22px;align-items:start;margin-top:18px}
+@media(max-width:860px){.editor{grid-template-columns:1fr}}
+.panel{background:color-mix(in srgb,var(--surface) 88%,transparent);border:1px solid var(--border);border-radius:16px;padding:18px}
+.panel h2{margin:0 0 4px;font-size:1rem}
+.panel .sub{margin:0 0 14px;color:var(--muted);font-size:.85rem}
+.field{margin-bottom:14px}
+.field>label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+.field textarea,.field input,.field select{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font:inherit;font-size:.92rem;outline:none}
+.field textarea{resize:vertical;min-height:96px;line-height:1.45}
+.field textarea:focus,.field input:focus,.field select:focus{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gen{width:100%;margin-top:6px;padding:13px 18px;font-size:.98rem;font-weight:700;border:none;border-radius:999px;cursor:pointer;color:#fff;background:linear-gradient(120deg,var(--accent),var(--accent2));box-shadow:0 10px 26px rgba(124,92,255,.34)}
+.gen:hover{filter:brightness(1.05)}
+.gen:disabled{opacity:.7;cursor:default}
+.prolink{display:block;width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font:600 .82rem Inter;cursor:pointer;text-align:center;padding:6px}
+
+.stage{position:relative;display:flex;align-items:center;justify-content:center;padding:20px;border-radius:16px;background:linear-gradient(rgba(20,23,31,.5),rgba(20,23,31,.5)),repeating-conic-gradient(rgba(255,255,255,.04) 0% 25%,transparent 0% 50%) 0/22px 22px;border:1px solid var(--border);min-height:420px}
+.stage video{max-width:min(340px,100%);border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.5);background:#000}
+.stage .placeholder{color:var(--muted);text-align:center;font-size:.9rem}
+.stage .spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-actions{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:999px;padding:9px 16px;font:600 .85rem Inter;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.disclaimer{margin-top:26px;padding:14px 16px;border-radius:12px;background:rgba(255,92,138,.06);border:1px solid rgba(255,92,138,.24);color:var(--muted);font-size:.82rem}
+.disclaimer b{color:var(--text)}
+.footer{margin-top:28px;text-align:center;color:var(--muted);font-size:.82rem}
+.footer a{color:var(--accent);text-decoration:none}

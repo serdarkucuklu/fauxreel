@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+output/*.mp4
+assets/music/
+node_modules/
+.vercel
+*.log
+output/*.png
+*.mp3

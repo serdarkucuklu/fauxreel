@@ -1,0 +1,42 @@
+name: render
+# Free render farm: each job is a repository_dispatch that renders one video and
+# publishes it as a public GitHub Release asset. Public repo => unlimited Actions minutes.
+on:
+  repository_dispatch:
+    types: [render]
+
+permissions:
+  contents: write   # create/upload the "renders" release
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Render (job comes from client_payload via GITHUB_EVENT_PATH)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # optional (topic -> script)
+        run: python worker.py
+
+      - name: Publish to the "renders" release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ID="${{ github.event.client_payload.id }}"
+          gh release view renders >/dev/null 2>&1 || \
+            gh release create renders --title renders --notes "FauxReel render outputs" --latest=false
+          gh release upload renders "output/render-$ID.mp4" --clobber
+          echo "published: https://github.com/${{ github.repository }}/releases/download/renders/render-$ID.mp4"
