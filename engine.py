@@ -175,7 +175,7 @@ def render_video(job, out_path):
       "script": "spoken narration (drives captions + duration)",
       "voice":  "en-US-JennyNeural",     # any edge-tts voice
       "rate":   "+0%",
-      "brand":  "fauxreel.app",          # burned watermark
+      "brand":  "fauxreel.vercel.app",          # burned watermark
       "mood":   "calm"|"drive"|"bright", # synth music color
       "scenes": [ {"prompt": "image prompt"} , ... ]  # visuals
     }
@@ -220,7 +220,7 @@ def render_video(job, out_path):
         music = os.path.join(work, "music.wav")
         synth_music(music, total + 1.0, job.get("mood", "calm"))
         brand = os.path.join(work, "brand.png")
-        make_brand_png(job.get("brand", "fauxreel.app"), brand)
+        make_brand_png(job.get("brand", "fauxreel.vercel.app"), brand)
 
         # 4) final composite: burn captions (SRT) + brand overlay + VO + music.
         #    subtitles= chokes on Windows paths -> run from work dir, basename ref.
@@ -254,7 +254,7 @@ if __name__ == "__main__":
         "script": "Most people never start. They wait for the perfect moment. But the perfect moment is a myth. You build momentum by beginning, today, right now.",
         "voice": "en-US-JennyNeural",
         "rate": "+0%",
-        "brand": "fauxreel.app",
+        "brand": "fauxreel.vercel.app",
         "mood": "drive",
         "scenes": [
             {"prompt": "lone figure walking up a misty mountain trail at sunrise, dramatic light"},

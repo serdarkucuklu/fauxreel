@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
     text: String(body.text || "").slice(0, 1200),
     mode: body.mode === "script" || body.mode === "topic" ? body.mode : undefined,
     voice: body.voice, rate: body.rate, mood: body.mood,
-    brand: body.pro ? "" : "fauxreel.app",   // Pro removes the watermark
+    brand: body.pro ? "" : "fauxreel.vercel.app",   // Pro removes the watermark
     scenes: Array.isArray(body.scenes) ? body.scenes.slice(0, 5) : [],
   };
 

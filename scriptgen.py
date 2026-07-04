@@ -108,7 +108,7 @@ def finalize_job(raw):
         "script": script,
         "voice": raw.get("voice") or "en-US-JennyNeural",
         "rate": raw.get("rate") or "+0%",
-        "brand": raw.get("brand", "fauxreel.app"),
+        "brand": raw.get("brand", "fauxreel.vercel.app"),
         "mood": raw.get("mood") or "drive",
         "scenes": scenes[:5],
     }
