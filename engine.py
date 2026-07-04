@@ -155,6 +155,63 @@ def generate_voiceover(text, voice, rate, mp3, srt):
     asyncio.run(_tts(text, voice, rate, mp3, srt))
 
 
+# ── karaoke captions (word-by-word pop, Hormozi/TikTok style) ────────────────
+def _srt_to_events(srt_path):
+    """Parse an SRT into [(start_sec, end_sec, word), ...]."""
+    def ts(t):
+        t = t.strip().replace(",", ".")
+        h, m, s = t.split(":")
+        return int(h) * 3600 + int(m) * 60 + float(s)
+    events, block = [], []
+    with open(srt_path, encoding="utf-8") as f:
+        raw = f.read().strip()
+    for chunk in raw.split("\n\n"):
+        lines = [l for l in chunk.splitlines() if l.strip()]
+        if len(lines) < 2:
+            continue
+        tl = next((l for l in lines if "-->" in l), None)
+        if not tl:
+            continue
+        a, b = tl.split("-->")
+        text = " ".join(lines[lines.index(tl) + 1:]).strip()
+        if text:
+            events.append((ts(a), ts(b), text))
+    return events
+
+def _ass_time(sec):
+    cs = int(round(sec * 100))
+    h = cs // 360000; cs -= h * 360000
+    m = cs // 6000; cs -= m * 6000
+    s = cs // 100; cs -= s * 100
+    return f"{h:d}:{m:02d}:{s:02d}.{cs:02d}"
+
+def srt_to_karaoke_ass(srt_path, ass_path, accent="&H0033CCFF", fontsize=120, margin_v=0):
+    """Write an ASS where each word pops in big, centered — the modern faceless look.
+       accent = ASS BGR hex for the highlight tint (default gold). margin_v shifts from center."""
+    events = _srt_to_events(srt_path)
+    header = (
+        "[Script Info]\nScriptType: v4.00+\nPlayResX: 1080\nPlayResY: 1920\nWrapStyle: 2\n\n"
+        "[V4+ Styles]\n"
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, "
+        "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
+        "Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        f"Style: Pop,Montserrat,{fontsize},&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,"
+        f"-1,0,0,0,100,100,0,0,1,7,3,5,60,60,{margin_v},1\n\n"
+        "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+    )
+    lines = []
+    for (a, b, word) in events:
+        dur = max(0.05, b - a)
+        popn = int(min(120, dur * 1000 * 0.35))
+        # pop-in scale 55->112->100 + slight upward drift; whole word tinted on the "hit"
+        eff = (r"{\an5\fad(40,40)\fscx55\fscy55"
+               r"\t(0," + str(popn) + r",\fscx112\fscy112)"
+               r"\t(" + str(popn) + r"," + str(popn + 60) + r",\fscx100\fscy100)}")
+        lines.append(f"Dialogue: 0,{_ass_time(a)},{_ass_time(b)},Pop,,0,0,0,,{eff}{word.upper()}")
+    with open(ass_path, "w", encoding="utf-8") as f:
+        f.write(header + "\n".join(lines) + "\n")
+
+
 # ── brand overlay ────────────────────────────────────────────────────────────
 def make_brand_png(text, out_png):
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -224,16 +281,15 @@ def render_video(job, out_path):
 
         # 4) final composite: burn captions (SRT) + brand overlay + VO + music.
         #    subtitles= chokes on Windows paths -> run from work dir, basename ref.
-        # SRT has no PlayRes -> libass uses a 384x288 script space, so Fontsize/MarginV are
-        # in that space and scale up ~6.67x to 1080x1920. Tuned so captions sit in the lower
-        # third, above the brand mark (verified empirically). Do NOT set original_size.
-        style = ("Fontsize=15,Alignment=2,MarginV=52,PrimaryColour=&H00FFFFFF&,"
-                 "OutlineColour=&H00000000&,BorderStyle=1,Outline=1,Shadow=0,Bold=1")
-        fc = (f"[0:v]subtitles=subs.srt:force_style='{style}'[sv];"
-              f"[sv][1:v]overlay=0:0[v];"
-              f"[2:a]volume=1.0[voa];[3:a]volume=0.14[bg];"
-              f"[voa][bg]amix=inputs=2:duration=first:dropout_transition=0,"
-              f"afade=t=in:st=0:d=0.8,loudnorm=I=-14:TP=-1.5:LRA=11[a]")
+        # Karaoke word-pop captions (ASS, PlayRes 1080x1920). Font via fontsdir (cwd=work).
+        ass = os.path.join(work, "subs.ass")
+        srt_to_karaoke_ass(srt, ass)
+        shutil.copy(FONT_PATH, os.path.join(work, "Montserrat-Bold.ttf"))
+        fc = ("[0:v]ass=subs.ass:fontsdir=.[sv];"
+              "[sv][1:v]overlay=0:0[v];"
+              "[2:a]volume=1.0[voa];[3:a]volume=0.14[bg];"
+              "[voa][bg]amix=inputs=2:duration=first:dropout_transition=0,"
+              "afade=t=in:st=0:d=0.8,loudnorm=I=-14:TP=-1.5:LRA=11[a]")
         out_abs = os.path.abspath(out_path)
         cmd = [_ff(), "-y", "-i", os.path.abspath(base),
                "-loop", "1", "-framerate", str(FPS), "-t", f"{total:.3f}", "-i", os.path.abspath(brand),
